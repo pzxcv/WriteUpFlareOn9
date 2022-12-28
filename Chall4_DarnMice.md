@@ -1,2 +1,2 @@
 # Darn Mice
-![Screenshot](4_1.png)
+![Screenshot](pic/4_1.png)
