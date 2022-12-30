@@ -9,7 +9,7 @@ Flow chương trình rất đơn giản, chỉ cần trỏ đường dẫn tới
 
 Khi phân tích file đã bị mã hóa (kết hợp phân tích mã nguồn), có được cấu trúc chương trình mã hóa:
 - Đoạn dữ liệu bị mã hóa (dạng hex)
-- 4 Đoạn giá trị Hex 256 bytes lưu dưới dạng ASCII.
+- 4 Đoạn giá trị Hex 256 bytes lưu dưới dạng ASCII, phân cách bằng 0xA.
 ![Screenshot](/pic/9_2.png)
 Đây là một challenge thiên về crypto, sử dụng một số thuật toán khá khó để dịch ngược. Chỉ có thể xác định được flow chung của chương trình, còn những hàm sâu nhất phải sử dụng thêm *chiêu trò* mới có thể xác định được.
 
