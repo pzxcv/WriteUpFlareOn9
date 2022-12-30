@@ -30,7 +30,18 @@ Khi tiến hành phân tích động, với các hàm không xác định đư�
 
 ![Screenshot](/pic/9_3.png)
 
-Ở pha (2), chương trình mới lấy giá trị ra rồi tiến hành mã hóa với Salsa20/Chacha. Ngoài input ra thì để mã hóa, thuật toán này cần 2 param nữa là *key* 32 byte và *nonce* 12 byte, 2 param này được tạo ra bằng hàm random số __SystemFunction036__. Sau khi được mã hóa để tính *c* như pha (1) (output v9) thì ghi ra file mã hóa ở 256 bytes cuối cùng.
+Ở pha (2) và (3), chương trình mới lấy giá trị ra rồi tiến hành mã hóa với Salsa20/Chacha. Ngoài input ra thì để mã hóa, thuật toán này cần 2 param nữa là *key* 32 byte và *nonce* 12 byte, 2 param này được tạo ra bằng hàm random số __SystemFunction036__. Sau khi được mã hóa để tính *c* như pha (1) (output v9) thì ghi ra file mã hóa ở 256 bytes cuối cùng.
 ![Screenshot](/pic/9_4.png)
 
-Các qword_409100, byte_4050A0 và byte_409060 lần lượt là n được tính từ pha 1, một hằng số trong chương trình và cuối cùng là con số "vô dụng" được nhắc từ trước. Và dĩ nhiên
+Các qword_409100, byte_4050A0 và byte_409060 lần lượt là n được tính từ pha 1, một hằng số trong chương trình và cuối cùng là con số "vô dụng" được nhắc từ trước. Và dĩ nhiên hằng số trên cũng "vô dụng" luôn. Và lý do sẽ được giải thích trong qua trình mã hóa chi tiết phía dưới.
+
+***Tổng hợp lại chi tiết quá trình mã hóa***
+- Pha (1) là quá trình tạo cặp khóa công khai (n,e) và vô tình tính luôn d (gán vào biến e_like). Lúc này tạm gọi d này là d1. Các giá trị m tính ra và hằng số byte_4050A0 ở param cuối hàm sub_4016CC là vô nghĩa vì param cuối đóng vai trò là số n, nhưng hằng số này không được sử dụng trong mã hóa lúc sau.
+- Pha (2) và (3) sử dụng n tính từ (1) làm n chính trong việc tính c, với đầu vào là chuỗi giá trị key và nonce. Trong trường hợp này gọi là n2 và c2. Hàm tính c2 lúc này đã lấy n2 bằng n1, d1 để làm e, tạm gọi là e2=d1. Theo quy tắc của RSA, sẽ tồn tại cặp d,e sao cho d * e (trùng) (1 mod *phi*). Và do phép nhân có tính giao hoán, nên có thể đổi vai trò của 2 số này cho nhau được. Vì thế đã khiến khóa d vốn cần giữ bí mật thì lại bị lộ ngay từ ban đầu. Để giải mã, dùng công thức m=c^d mod n; Và d2 lúc này chính là e1 ban đầu (e1 * d1 tương ứng e2 * d2 do cùng n).
+- Các giá trị hex trong file mã hóa lần lượt là giá trị của hằng số byte_4050A0 vô dụng, n được tính từ pha (1), byte_409060 vô dụng và n2 quan trọng.
+
+**Vì thế quá trình giải mã như sau**
+- Từ n2 có được và d2 bị lộ (bằng 0x10001), tính được m2, vốn là cặp key và nonce của thuật toán đối xứng Salsa20/Chacha
+- Dùng cặp key và nonce và đoạn input bị mã hóa ở đầu file để giải mã văn bản gốc, từ đó có được flag.
+
+
