@@ -24,6 +24,7 @@ Dựa vào thông tin mà PEid cung cấp ở hình 1 (list các số *nguyên t
 
 Khi tiến hành phân tích tĩnh, xác định được thêm 1 thuật toán mã hóa được sử dụng, đó là *Salsa20/Chacha* với string  __"expand 32-byte k"__.
 
+
 Khi tiến hành phân tích động, với các hàm không xác định được chức năng thì tiến hành biện pháp *thử - sai*, rồi lấy ra kết quả. Trong trường hợp này ngoại trừ phần mã hóa Salsa2-/Chacha ra thì thử bằng các input của RSA với kết quả có thể tính được, sau đó đối chiếu. Từ đó xác định được thuật toán là RSA thuần, sử dụng số nguyên tố dưới dạng hex. (https://vi.wikipedia.org/wiki/RSA_(m%C3%A3_h%C3%B3a))
 
 Ở đoạn mã pha (1) như hình dưới, các hàm lần lượt tạo p và q, sau đó tính n, phi sau đó tính d. Ở hàm *sub_4016CC* thì thực hiện tính ra *c = m^e mod n* và lưu vào param đầu. Thực tế thì ở pha (1) thì biến __byte_409060__ là không có giá trị gì dù có trong file mã hóa. Lưu ý rằng giá trị e_like ban đầu (trước hàm sub_401B46) được gán bằng 0x10001, nhưng sau khi thực thi nó mang giá trị __*d*__ (phần này rất quan trọng).
@@ -44,4 +45,6 @@ Các qword_409100, byte_4050A0 và byte_409060 lần lượt là n được tín
 - Từ n2 có được và d2 bị lộ (bằng 0x10001), tính được m2, vốn là cặp key và nonce của thuật toán đối xứng Salsa20/Chacha
 - Dùng cặp key và nonce và đoạn input bị mã hóa ở đầu file để giải mã văn bản gốc, từ đó có được flag.
 
+Việc thực hiện giải mã có rất nhiều cách khác nhau, có thể thực hiện lại việc mã hóa, hoặc đơn giản hơn là đưa dữ liệu thẳng vào chương trình. Việc giải mã ra flag ban đầu sử dụng thuật toán mã hóa đối xứng, do vậy với thuật toán bất đối xứng, sau khi tự tính ra cặp key và nonce, sau đó patch vào debugger để chương trình tự giải mã ra data. Kết quả thu được là nội dung đoạn text có chứa flag.
 
+![Screenshot](/pic/9_5.png)
